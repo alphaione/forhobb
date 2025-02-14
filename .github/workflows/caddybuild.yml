@@ -1,0 +1,55 @@
+name: Multiarch Caddy Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每日自动同步
+  workflow_dispatch:
+    inputs:
+      custom_version:
+        description: "指定Caddy版本 (e.g. '2.7.5')"
+        required: false
+
+env:
+  PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare environment
+        id: prep
+        run: |
+          # 自动获取最新版本或使用手动输入
+          if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+            VERSION=${{ github.event.inputs.custom_version }}
+          else
+            VERSION=$(curl -s "https://api.github.com/repos/caddyserver/caddy/releases/latest" | jq -r '.tag_name' | sed 's/v//')
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "base_image=caddy:${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./mak
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          build-args: |
+            CADDY_VERSION=${{ steps.prep.outputs.version }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/caddy:${{ steps.prep.outputs.version }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/caddy:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
