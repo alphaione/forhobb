@@ -2,7 +2,7 @@ name: Multiarch Caddy Build
 
 on:
   schedule:
-    - cron: '0 0 */3 * *' # 每日自动同步
+    - cron: '0 0 */9 * *' # 每日自动同步
   workflow_dispatch:
     inputs:
       custom_version:
