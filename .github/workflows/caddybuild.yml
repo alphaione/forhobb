@@ -2,7 +2,7 @@ name: Multiarch Caddy Build
 
 on:
   schedule:
-    - cron: '0 0 * * *' # 每日自动同步
+    - cron: '0 0 */3 * *' # 每日自动同步
   workflow_dispatch:
     inputs:
       custom_version:
@@ -52,5 +52,6 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/caddy:${{ steps.prep.outputs.version }}
             ${{ secrets.DOCKERHUB_USERNAME }}/caddy:alpine
+            ${{ secrets.DOCKERHUB_USERNAME }}/caddy:latest
           labels: |
             org.opencontainers.image.source=${{ github.repositoryUrl }}
