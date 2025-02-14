@@ -53,8 +53,8 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-lang:latest-${{ matrix.dockerfile.tag }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-lang:${{ matrix.dockerfile.tag }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-lang:${{ github.run_number }}-${{ matrix.dockerfile.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:latest-${{ matrix.dockerfile.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:${{ matrix.dockerfile.tag }}
+       #     ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-lang:${{ github.run_number }}-${{ matrix.dockerfile.tag }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
