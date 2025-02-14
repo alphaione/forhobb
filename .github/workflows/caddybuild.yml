@@ -51,6 +51,6 @@ jobs:
             CADDY_VERSION=${{ steps.prep.outputs.version }}
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/caddy:${{ steps.prep.outputs.version }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/caddy:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/caddy:alpine
           labels: |
             org.opencontainers.image.source=${{ github.repositoryUrl }}
