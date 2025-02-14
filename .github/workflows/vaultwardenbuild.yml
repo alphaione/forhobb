@@ -29,6 +29,12 @@ jobs:
           ref: main # 可改为特定分支或tag
           path: source-code
 
+      - name: Get latest release
+        id: get-release
+        run: |
+          LATEST_RELEASE=$(curl -sL https://api.github.com/repos/dani-garcia/vaultwarden/releases/latest | jq -r '.tag_name')
+          echo "latest_release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
+
       # 配置多架构构建环境
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
@@ -52,9 +58,11 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:latest-${{ matrix.dockerfile.tag }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:${{ steps.get-release.outputs.latest_release }}-${{ matrix.dockerfile.tag }}
             ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:${{ matrix.dockerfile.tag }}
        #     ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-lang:${{ github.run_number }}-${{ matrix.dockerfile.tag }}
+          build-args: |
+            VAULTWARDEN_VERSION=${{ steps.get-release.outputs.latest_release }}          
           cache-from: type=gha
           cache-to: type=gha,mode=max
           
