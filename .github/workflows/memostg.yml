@@ -22,7 +22,35 @@ jobs:
 
       - name: Replace dockerfile
         run: |
-          mv ./memosbot ./source-code/dockerfile
+          cat <<EOF > ./source-code/Dockerfile
+          # Build stage
+          FROM --platform=$BUILDPLATFORM golang:1.20-alpine AS builder
+
+          WORKDIR /app
+
+          RUN apk add --no-cache git
+
+          COPY go.mod go.sum ./
+          RUN go mod download
+
+          COPY . .
+          ARG TARGETOS
+          ARG TARGETARCH
+          RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w" -o memogram ./bin/memogram
+
+          # Run stage
+          FROM --platform=$TARGETPLATFORM gcr.io/distroless/static:nonroot
+
+          WORKDIR /app
+
+          ENV SERVER_ADDR=dns:localhost:5230
+          ENV BOT_TOKEN=your_telegram_bot_token
+
+          COPY --from=builder /app/memogram .
+          COPY .env.example .env
+
+          CMD ["./memogram"]
+          EOF
 
       - name: Get latest release
         id: get-release
