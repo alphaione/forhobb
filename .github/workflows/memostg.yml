@@ -1,0 +1,59 @@
+name: Auto Build MemosTGbot
+on:
+  workflow_dispatch: # 手动触发按钮
+  schedule: # 每周日北京时间10点自动构建
+    - cron: '0 2 * * 0'
+
+jobs:
+  cross-platform-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # 直接拉取源仓库代码
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          repository: usememos/telegram-integration
+          ref: main # 可改为特定分支或tag
+          path: source-code
+
+      - name: Get latest release
+        id: get-release
+        run: |
+          LATEST_RELEASE=$(curl -sL https://api.github.com/repos/usememos/telegram-integration/releases/latest | jq -r '.tag_name')
+          echo "latest_release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
+
+      # 配置多架构构建环境
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Setup Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Docker 登录
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # 多平台构建推送
+      - name: Build and Push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./source-code
+          file: ./source-code/Dockerfile
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/memosbot:${{ steps.get-release.outputs.latest_release }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/memosbot:latest
+          build-args: |
+            MEMOSBOT_VERSION=${{ steps.get-release.outputs.latest_release }}          
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          
+
