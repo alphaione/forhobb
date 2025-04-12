@@ -22,7 +22,7 @@ jobs:
 
       - name: Replace dockerfile
         run: |
-          mv $GITHUB_WORKSPACE/memosbot $GITHUB_WORKSPACE/source-code/memosbot
+          ls -a
 
       - name: Get latest release
         id: get-release
