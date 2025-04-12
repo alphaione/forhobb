@@ -8,6 +8,7 @@ jobs:
   cross-platform-build:
     runs-on: ubuntu-latest
 
+    steps:
       # 直接拉取源仓库代码
       - name: Checkout Source
         uses: actions/checkout@v4
