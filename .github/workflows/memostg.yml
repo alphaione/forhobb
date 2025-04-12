@@ -77,7 +77,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ./source-code
-          file: ./source-code/dockerfile
+          file: ./source-code/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
