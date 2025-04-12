@@ -1,0 +1,39 @@
+# 构建阶段：使用多平台构建优化镜像
+FROM --platform=$BUILDPLATFORM golang:1.21-alpine AS builder
+WORKDIR /app
+
+# 安装必要构建工具（按需添加）
+RUN apk add --no-cache git ca-certificates
+
+# 仅复制模块文件并下载依赖（利用Docker层缓存）
+COPY go.mod go.sum ./
+RUN go mod download -x
+
+# 复制源码并构建（排除非必要文件）
+COPY ./bin ./bin
+COPY *.go ./
+ARG TARGETOS TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -ldflags="-s -w" -trimpath -o /out/memogram ./bin/memogram
+
+# ----------------------------------------
+# 运行阶段：使用极简Alpine镜像
+FROM alpine:3.19
+WORKDIR /app
+
+# 设置必要环境变量（实际值应通过运行时注入）
+ENV SERVER_ADDR=dns:localhost:5230 \
+    BOT_TOKEN=your_telegram_bot_token
+
+# 从构建阶段复制必要文件
+COPY --from=builder /out/memogram /app/
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+# 安全加固配置
+RUN adduser -D -u 1000 appuser && \
+    chown -R appuser:appuser /app && \
+    chmod 500 /app/memogram
+
+USER appuser
+CMD ["/app/memogram"]
+ 
