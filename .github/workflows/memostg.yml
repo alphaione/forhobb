@@ -15,9 +15,6 @@ jobs:
           repository: usememos/telegram-integration
           ref: main # 可改为特定分支或tag
 
-      - name: CHECK
-        uses: actions/checkout@main
-
       - name: Get latest release
         id: get-release
         run: |
@@ -43,7 +40,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./memosbot
+          file: ./Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
