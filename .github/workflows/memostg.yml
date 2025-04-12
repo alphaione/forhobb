@@ -7,9 +7,6 @@ on:
 jobs:
   cross-platform-build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
 
     steps:
       - name: Checkout
@@ -21,11 +18,7 @@ jobs:
         with:
           repository: usememos/telegram-integration
           ref: main # 可改为特定分支或tag
-          path: source-code
-
-      - name: Replace dockerfile
-        run: |
-          mv ./memosbot ./source-code/Dockerfile
+          path: .
 
       - name: Get latest release
         id: get-release
@@ -51,8 +44,8 @@ jobs:
       - name: Build and Push
         uses: docker/build-push-action@v6
         with:
-          context: ./source-code
-          file: ./source-code/Dockerfile
+          context: .
+          file: ./memosbot
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
