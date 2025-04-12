@@ -12,6 +12,9 @@ jobs:
       packages: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@main
+
       # 直接拉取源仓库代码
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -22,35 +25,7 @@ jobs:
 
       - name: Replace dockerfile
         run: |
-          cat <<EOF > ./source-code/Dockerfile
-          # Build stage
-          FROM --platform=$BUILDPLATFORM golang:alpine AS builder
-
-          WORKDIR /app
-
-          RUN apk add --no-cache git
-
-          COPY go.mod go.sum ./source-code
-          RUN go mod download
-
-          COPY . .
-          ARG TARGETOS
-          ARG TARGETARCH
-          RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w" -o memogram ./source-code/bin/memogram
-
-          # Run stage
-          FROM --platform=$TARGETPLATFORM gcr.io/distroless/static:nonroot
-
-          WORKDIR /app
-
-          ENV SERVER_ADDR=dns:localhost:5230
-          ENV BOT_TOKEN=your_telegram_bot_token
-
-          COPY --from=builder /app/memogram .
-          COPY .env.example .env
-
-          CMD ["./memogram"]
-          EOF
+          mv ./memosbot ./source-code/Dockerfile
 
       - name: Get latest release
         id: get-release
