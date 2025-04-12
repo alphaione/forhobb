@@ -20,6 +20,10 @@ jobs:
           ref: main # 可改为特定分支或tag
           path: source-code
 
+      - name: Replace dockerfile
+        run: |
+          mv $GITHUB_WORKSPACE/memosbot $GITHUB_WORKSPACE/source-code/memosbot
+
       - name: Get latest release
         id: get-release
         run: |
