@@ -1,7 +1,7 @@
 name: Keepalive Workflow
 on:
   schedule:
-    - cron: "*/3 * * * *"
+    - cron: "*/5 * * * *"
 permissions:
   actions: write
 jobs:
