@@ -9,11 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # 定义要构建的 Dockerfile 列表及对应标签
-        dockerfile: [
-          { path: "docker/Dockerfile.alpine", tag: "alpine" },
-          { path: "docker/Dockerfile.debian", tag: "debian" }
-        ]
+        include:
+          - dockerfile: docker/Dockerfile.alpine
+            tag: alpine
+          - dockerfile: docker/Dockerfile.debian
+            tag: debian
       fail-fast: false # 允许单个失败不影响其他构建
 
     permissions:
