@@ -1,4 +1,4 @@
-name: Auto Build Vaultwarden from Source
+name: 自动构建 Vaultwarden | Auto Build Vaultwarden from Source
 on:
   workflow_dispatch:  # 手动触发按钮
   schedule:  # 每周日北京时间10点自动构建
@@ -21,36 +21,32 @@ jobs:
       packages: write
 
     steps:
-      # 直接拉取源仓库代码
-      - name: Checkout Source
+      - name: 🔄 检出源代码 | Checkout Source Code
         uses: actions/checkout@v4
         with:
           repository: JinkaiNiu/vaultwarden-zh-cn
           # ref: main  # 可改为特定分支或tag
           path: source-code
 
-      - name: Get latest release
+      - name: 🏷️ 获取最新发行版 | Get Latest Release
         id: get-release
         run: |
           LATEST_RELEASE=$(curl -sL https://api.github.com/repos/dani-garcia/vaultwarden/releases/latest | jq -r '.tag_name')
           echo "latest_release=${LATEST_RELEASE}" >> $GITHUB_OUTPUT
 
-      # 配置多架构构建环境
-      - name: Setup QEMU
+      - name: 🏗️ 配置 QEMU | Setup QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Setup Buildx
+      - name: 🔧 配置 Buildx | Setup Buildx
         uses: docker/setup-buildx-action@v3
 
-      # Docker 登录
-      - name: Login to Docker Hub
+      - name: 🔐 登录 Docker Hub | Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 多平台构建推送
-      - name: Build and Push
+      - name: 🚀 构建并推送镜像 | Build and Push Image
         uses: docker/build-push-action@v6
         with:
           context: ./source-code
@@ -60,10 +56,13 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:${{ steps.get-release.outputs.latest_release }}-${{ matrix.dockerfile.tag }}
             ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-self:${{ matrix.dockerfile.tag }}
-       #     ${{ secrets.DOCKERHUB_USERNAME }}/vaultwarden-lang:${{ github.run_number }}-${{ matrix.dockerfile.tag }}
           build-args: |
             VAULTWARDEN_VERSION=${{ steps.get-release.outputs.latest_release }}          
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: ✅ 完成并输出信息 | Complete and Print Info
+        run: |
+          echo "Build & push for ${{ matrix.dockerfile.tag }} completed, version: ${{ steps.get-release.outputs.latest_release }}"
           
 
