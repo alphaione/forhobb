@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: Build vaultwarden(${{ matrix.tag }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
