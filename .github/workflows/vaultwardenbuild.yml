@@ -67,3 +67,11 @@ jobs:
           echo "Vaultwarden-${{ matrix.tag }}镜像已构建并推送, 版本: ${{ steps.get-release.outputs.latest_release }}"
           echo "Build & push for Vaultwarden-${{ matrix.tag }} completed, version: ${{ steps.get-release.outputs.latest_release }}"
           
+      - name: 📦 提交 vault.version 文件 | Commit vault.version file
+        run: |
+          echo "${{ steps.get-release.outputs.latest_release }}" > vault.version
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add vault.version
+          git commit -m "chore: update vault.version to ${{ steps.get-release.outputs.latest_release }}" || echo "No changes to commit"
+          git push
