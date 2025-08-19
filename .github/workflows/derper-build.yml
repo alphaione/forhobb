@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       custom_version:
-        description: "指定Derper版本 (e.g. '2.7.5')"
+        description: "指定Derper版本 (e.g. 'v1.86.2')"
         required: false
 
 env:
