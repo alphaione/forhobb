@@ -1,0 +1,69 @@
+name: 多架构 Derper 构建 | Multiarch Derper Build
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每日自动同步
+  workflow_dispatch:
+    inputs:
+      custom_version:
+        description: "指定Derper版本 (e.g. '2.7.5')"
+        required: false
+
+env:
+  PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
+
+jobs:
+  derperbuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 检出代码 | Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🏷️ 准备环境 | Prepare Environment
+        id: prep
+        run: |
+          # 自动获取最新版本或使用手动输入
+          if [ -n "${{ github.event.inputs.custom_version }}" ]; then
+            VERSION=${{ github.event.inputs.custom_version }}
+          else
+            VERSION=$(curl -s https://api.github.com/repos/tailscale/tailscale/releases/latest | jq -r '.tag_name' | sed 's/v//')
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: 🛠️ 配置 Docker Buildx | Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 登录 Docker Hub | Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🚀 构建并推送镜像 | Build and Push Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/derper.dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          build-args: |
+            DERPER_VERSION=${{ steps.prep.outputs.version }}
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/derper:${{ steps.prep.outputs.version }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/derper:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.repositoryUrl }}
+
+      - name: ✅ 完成并输出信息 | Complete and Print Info
+        run: |
+          echo "Derper 镜像已构建并推送, 版本: ${{ steps.prep.outputs.version }}"
+          echo "Derper image has been built and pushed, version: ${{ steps.prep.outputs.version }}"
+
+      - name: 📝 写入版本号到 derper.version 文件 | Write Version to File
+        run: |
+          echo "${{ steps.prep.outputs.version }}" > derper.version
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add derper.version
+          git commit -m "chore: update version file to Derper ${{ steps.prep.outputs.version }}"
+          git push
