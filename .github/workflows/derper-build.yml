@@ -2,7 +2,7 @@ name: 多架构 Derper 构建 | Multiarch Derper Build
 
 on:
   schedule:
-    - cron: '0 0 * * *' # 每日自动同步
+    - cron: '0 0 */7 * *' # 每日自动同步
   workflow_dispatch:
     inputs:
       custom_version:
