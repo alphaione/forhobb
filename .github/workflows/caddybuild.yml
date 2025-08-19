@@ -60,3 +60,12 @@ jobs:
         run: |
           echo "Caddy 镜像已构建并推送, 版本: ${{ steps.prep.outputs.version }}"
           echo "Caddy image has been built and pushed, version: ${{ steps.prep.outputs.version }}"
+
+      - name: 📝 写入版本号到 caddy.version 文件 | Write Version to File
+        run: |
+          echo "${{ steps.prep.outputs.version }}" > caddy.version
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add caddy.version
+          git commit -m "chore: update version file to Caddy ${{ steps.prep.outputs.version }}"
+          git push
