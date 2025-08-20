@@ -31,20 +31,18 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "base_image=caddy:${VERSION}" >> $GITHUB_OUTPUT
 
-      - name: ⏭️ 检查版本号是否需要构建 | Check if build is needed
+      - name: ⏩ 检查版本是否需要构建 | Check If Build Needed
         id: version-check
         run: |
-          if [ -f caddy.version ]; then
-            OLD_VERSION=$(cat caddy.version)
-          else
-            OLD_VERSION=""
-          fi
-          echo "old_version=${OLD_VERSION}" >> $GITHUB_OUTPUT
-          if [ "${OLD_VERSION}" = "${{ steps.prep.outputs.version }}" ]; then
-            echo "当前版本与 caddy.version 相同，无需构建，跳过流程。"
+          NEW_VERSION="${{ steps.prep.outputs.version }}"
+          OLD_VERSION=$(cat caddy.version)
+          if [ "$NEW_VERSION" = "$OLD_VERSION" ]; then
             echo "skip_build=true" >> $GITHUB_OUTPUT
+            echo "版本未变化，跳过构建。"
           else
             echo "skip_build=false" >> $GITHUB_OUTPUT
+            echo "版本发生变化，继续构建。"
+          fi
 
       - name: 🛠️ 配置 Docker Buildx | Setup Docker Buildx
         if: steps.version-check.outputs.skip_build == 'false'
