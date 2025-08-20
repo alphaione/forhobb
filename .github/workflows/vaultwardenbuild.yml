@@ -38,7 +38,7 @@ jobs:
         run: |
           echo "latest_release is ${{ steps.get-release.outputs.latest_release }}"
           echo "skip_build is ${{ steps.check_version.outputs.skip_build }}" 
-          echo "needs.check_version.outputs.latest_release=${{ needs.check_version.outputs.latest_release }}"
+          
 
   build:
     needs: check_version
@@ -107,6 +107,7 @@ jobs:
       - name: 📦 提交 vault.version 文件 | Commit vault.version file
         run: |
           echo "${{ needs.check_version.outputs.latest_release }}" > vault.version
+          echo "needs.check_version.outputs.latest_release=${{ needs.check_version.outputs.latest_release }}"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add vault.version
