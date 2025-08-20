@@ -96,8 +96,6 @@ jobs:
   #  needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: 📦 提交 vault.version 文件 | Commit vault.version file
         run: |
           echo "${{ needs.check_version.outputs.latest_release }}" > vault.version
