@@ -99,7 +99,7 @@ jobs:
           echo "Build & push for Vaultwarden-${{ matrix.tag }} completed, version: ${{ needs.check_version.outputs.latest_release }}"
 
   commit_version:
-  #  needs: build
+    needs: check_version
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
