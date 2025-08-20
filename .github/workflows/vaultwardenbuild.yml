@@ -36,7 +36,7 @@ jobs:
 
   build:
     needs: check_version
-    if: needs.check_version.outputs.skip_build == 'false'
+    if: needs.check_version.outputs.skip_build == 'true'
     runs-on: ubuntu-latest
     name: Build vaultwarden(${{ matrix.tag }})
     strategy:
@@ -93,7 +93,7 @@ jobs:
           echo "Build & push for Vaultwarden-${{ matrix.tag }} completed, version: ${{ needs.check_version.outputs.latest_release }}"
 
   commit_version:
-    needs: build
+  #  needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
