@@ -32,6 +32,7 @@ jobs:
           else
             echo "skip_build=false" >> $GITHUB_OUTPUT
             echo "版本发生变化，继续构建。"
+          fi
 
   build:
     needs: check_version
