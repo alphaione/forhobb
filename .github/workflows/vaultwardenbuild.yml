@@ -21,7 +21,7 @@ jobs:
         id: check_version
         run: |
           NEW_VERSION="${{ steps.get-release.outputs.latest_release }}"
-          OLD_VERSION=$(cat vault.version)
+          OLD_VERSION=$(cat vault.version 2>/dev/null || echo "none")
           if [ "$NEW_VERSION" = "$OLD_VERSION" ]; then
             echo "skip_build=true" >> $GITHUB_OUTPUT
             echo "版本未变化，跳过构建。"
@@ -31,7 +31,7 @@ jobs:
 
   build:
     needs: check_version
-#    if: needs.check_version.outputs.skip_build == 'false'
+    if: needs.check_version.outputs.skip_build == 'false'
     runs-on: ubuntu-latest
     name: Build vaultwarden(${{ matrix.tag }})
     strategy:
