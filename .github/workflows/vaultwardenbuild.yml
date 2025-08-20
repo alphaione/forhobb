@@ -37,7 +37,8 @@ jobs:
       - name: Debug latest_release
         run: |
           echo "latest_release is ${{ steps.get-release.outputs.latest_release }}"
-          echo "skip_build is ${{ steps.check_version.outputs.skip_build }}"          
+          echo "skip_build is ${{ steps.check_version.outputs.skip_build }}" 
+          echo "needs.check_version.outputs.latest_release=${{ needs.check_version.outputs.latest_release }}"
 
   build:
     needs: check_version
@@ -54,7 +55,7 @@ jobs:
       fail-fast: false # 允许单个失败不影响其他构建
 
     permissions:
-      contents: read
+      contents: write
       packages: write
       
     steps:
