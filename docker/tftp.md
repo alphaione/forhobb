@@ -39,3 +39,12 @@ tftp> get amd.efi
 Received 1024624 bytes in 0.5 seconds
 tftp> quit
 ```
+
+包含的 EFI 文件
+
+| 文件名 | 架构 | 源地址 |
+|--------|------|--------|
+| `amd.efi` | x86_64 | [boot.netboot.xyz/ipxe/netboot.xyz.efi](https://boot.netboot.xyz/ipxe/netboot.xyz.efi) |
+| `amd-snp.efi` | x86_64 (安全启动) | [boot.netboot.xyz/ipxe/netboot.xyz-snp.efi](https://boot.netboot.xyz/ipxe/netboot.xyz-snp.efi) |
+| `arm.efi` | ARM64 | [boot.netboot.xyz/ipxe/netboot.xyz-arm64.efi](https://boot.netboot.xyz/ipxe/netboot.xyz-arm64.efi) |
+
