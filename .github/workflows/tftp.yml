@@ -1,0 +1,45 @@
+name: 多架构 Tftp 构建 | Multiarch Tftp Build
+
+on:
+  workflow_dispatch:
+
+env:
+  PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
+
+jobs:
+  tftpbuild:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🔄 检出代码 | Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 🛠️ 配置 Docker Buildx | Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: 🔐 登录 Docker Hub | Login to Docker Hub
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: 🚀 构建并推送镜像 | Build and Push Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./docker/netboot-tftp.dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/tftp:latest
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v5
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/tftp
+          readme-filepath: ./docker/tftp.md
+
+      - name: ✅ 完成并输出信息 | Complete and Print Info
+        run: |
+          echo "Tftp 镜像已构建并推送"
+          echo "Tftp image has been built and pushe"
