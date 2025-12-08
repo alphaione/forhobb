@@ -10,8 +10,7 @@ WORKDIR /app
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apk update && \
-    apk add --no-cache apk-tools && \
-    apk add --no-cache ca-certificates && \
+    apk add --no-cache --no-scripts apk-tools ca-certificates && \
     rm -rf /var/cache/apk/* && \
     mkdir /app/certs
 
