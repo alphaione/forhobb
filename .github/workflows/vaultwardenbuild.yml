@@ -12,7 +12,7 @@ jobs:
       latest_release: ${{ steps.get-release.outputs.latest_release }}
     steps:
       - name: 🔄 检出源代码 | Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: 🏷️ 获取最新发行版 | Get Latest Release
         id: get-release
         run: |
@@ -56,26 +56,26 @@ jobs:
       
     steps:
       - name: 🔄 检出源代码 | Checkout Source Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: JinkaiNiu/vaultwarden-zh-cn
           # ref: main  # 可改为特定分支或tag
           path: source-code
 
-      - name: 🏗️ 配置 QEMU | Setup QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: 🔧 配置 Buildx | Setup Buildx
-        uses: docker/setup-buildx-action@v3
-
       - name: 🔐 登录 Docker Hub | Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v3.6.0
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: 🏗️ 配置 QEMU | Setup QEMU
+        uses: docker/setup-qemu-action@v3.7.0
+
+      - name: 🔧 配置 Buildx | Setup Buildx
+        uses: docker/setup-buildx-action@v3.11.1
+
       - name: 🚀 构建并推送镜像 | Build and Push Image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v6.18.0
         with:
           context: ./source-code
           file: ./source-code/${{ matrix.dockerfile }}
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: 📦 提交 vault.version 文件 | Commit vault.version file
         run: |
           echo "${{ needs.check_version.outputs.latest_release }}" > vault.version
