@@ -52,6 +52,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           
       - name: 🛠️ 配置 QEMU | Set up QEMU
+        if: steps.version-check.outputs.skip_build == 'false'
         uses: docker/setup-qemu-action@v3.7.0
      
       - name: 🛠️ 配置 Docker Buildx | Setup Docker Buildx
