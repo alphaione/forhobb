@@ -1,8 +1,8 @@
 name: 自动构建 Vaultwarden | Auto Build Vaultwarden from Source
 on:
   workflow_dispatch:  # 手动触发按钮
-  schedule:  # 每日北京时间10点自动构建
-    - cron: '0 2 * * *'
+  schedule:  # 每日北京时间13点自动构建
+    - cron: '0 5 * * *'
 
 jobs:
   check_version:
