@@ -1,8 +1,8 @@
-name: 多架构 Derper Distroless构建 | Multiarch Derper Build
+name: 多架构 Derper alpine构建 | Multiarch Derper Build
 
 on:
-  schedule:
-    - cron: '0 1 * * *' # 每日自动同步
+ # schedule:
+ #   - cron: '0 1 * * *' # 每日自动同步
   workflow_dispatch:
     inputs:
       custom_version:
