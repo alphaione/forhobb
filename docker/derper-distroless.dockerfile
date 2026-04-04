@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 仅安装 git（go install 必须）
 RUN apk add --no-cache git
-
+RUN mkdir -p /app/certs
 # 构建 derper
 ARG DERP_VERSION=latest
 RUN CGO_ENABLED=0 go install -ldflags="-s -w" tailscale.com/cmd/derper@${DERP_VERSION}
@@ -17,11 +17,9 @@ RUN CGO_ENABLED=0 go install -ldflags="-s -w" tailscale.com/cmd/derper@${DERP_VE
 FROM gcr.io/distroless/static-debian12:latest
 WORKDIR /app
 
-# 仅创建证书目录
-RUN mkdir -p /app/certs
-
 # 复制二进制（仅一个文件）
 COPY --from=builder /go/bin/derper /app/derper
+COPY --from=builder /app/certs /app/certs
 
 # 环境变量
 ENV DERP_DOMAIN=your-hostname.com
