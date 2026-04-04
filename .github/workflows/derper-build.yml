@@ -63,7 +63,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          file: ./docker/derper.dockerfile
+          file: ./docker/derper-alpine.dockerfile
           platforms: ${{ env.PLATFORMS }}
           push: true
           build-args: |
